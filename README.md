@@ -15,4 +15,5 @@ To include it in your project, add
 ```
   ivy"org.julianmichael::radhoc::0.1.0"
 ```
-to your `ivyDeps` in your Mill build. More documentation coming if anyone requests it.
+to your `ivyDeps` in your Mill build. You will also need `react` and `react-dom` 15.6.1 loaded in JS
+when running React to use these components.  More documentation coming if anyone requests it.
