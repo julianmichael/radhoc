@@ -3,26 +3,26 @@ package radhoc
 import japgolly.scalajs.react.vdom.html_<^._
 import japgolly.scalajs.react._
 
-object LocalState {
-  type State[A] = A
-  type Context[A] = A => Callback
-  case class Props[A](
+class LocalState[A] {
+  type State = A
+  type Context = A => Callback
+  case class Props(
     initialValue: A,
     shouldRefresh: A => Boolean = (_: A) => true,
     render: StateVal[A] => VdomElement
   )
 
-  class Backend[A](scope: BackendScope[Props[A], State[A]]) {
+  class Backend(scope: BackendScope[Props, State]) {
     def set(a: A): Callback = scope.setState(a)
 
-    def render(props: Props[A], state: State[A]) =
+    def render(props: Props, state: State) =
       props.render(StateVal(state, set _))
   }
 
-  def Component[A] = ScalaComponent
-    .builder[Props[A]]("Local")
+  val Component = ScalaComponent
+    .builder[Props]("Local")
     .initialStateFromProps(_.initialValue)
-    .renderBackend[Backend[A]]
+    .renderBackend[Backend]
     .componentWillReceiveProps(
       context =>
         if (context.currentProps.initialValue != context.nextProps.initialValue &&
@@ -32,9 +32,9 @@ object LocalState {
     )
     .build
 
-  def make[A](initialValue: A, shouldRefresh: A => Boolean = (_: A) => true)(
+  def make(initialValue: A, shouldRefresh: A => Boolean = (_: A) => true)(
     render: StateVal[A] => VdomElement
   ) = {
-    Component[A](Props[A](initialValue, shouldRefresh, render))
+    Component(Props(initialValue, shouldRefresh, render))
   }
 }
