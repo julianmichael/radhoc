@@ -13,8 +13,8 @@ val kindProjectorVersion = "0.9.4"
 
 // cats libs -- make sure versions match up
 val catsVersion = "1.1.0"
-val monocleVersion = "1.4.0"
-val scalajsReactVersion = "1.1.0"
+val monocleVersion = "1.5.1-cats"
+val scalajsReactVersion = "1.2.3"
 
 class RadhocModule(val crossScalaVersion: String) extends CrossScalaModule with ScalaJSModule with ScalafmtModule with PublishModule {
 
