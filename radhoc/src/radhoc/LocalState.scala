@@ -2,6 +2,7 @@ package radhoc
 
 import japgolly.scalajs.react.vdom.html_<^._
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.extra.StateSnapshot
 
 class LocalState[A] {
   type State = A
@@ -9,31 +10,23 @@ class LocalState[A] {
   case class Props(
     initialValue: A,
     shouldRefresh: A => Boolean = (_: A) => true,
-    render: StateVal[A] => VdomElement
+    render: StateSnapshot[A] => VdomElement
   )
 
-  class Backend(scope: BackendScope[Props, State]) {
-    def set(a: A): Callback = scope.setState(a)
-
-    def render(props: Props, state: State) =
-      props.render(StateVal(state, set _))
-  }
-
   val Component = ScalaComponent
-    .builder[Props]("Local")
+    .builder[Props]("LocalState")
     .initialStateFromProps(_.initialValue)
-    .renderBackend[Backend]
-    .componentWillReceiveProps(
-      context =>
-        if (context.currentProps.initialValue != context.nextProps.initialValue &&
-            context.nextProps.shouldRefresh(context.state)) {
-          context.backend.set(context.nextProps.initialValue)
-        } else Callback.empty
-    )
+    .render { $ => $.props.render(StateSnapshot.of($)) }
+    .componentWillReceiveProps { $ =>
+      if ($.currentProps.initialValue != $.nextProps.initialValue &&
+            $.nextProps.shouldRefresh($.state)) {
+        $.setState($.nextProps.initialValue)
+      } else Callback.empty
+    }
     .build
 
   def make(initialValue: A, shouldRefresh: A => Boolean = (_: A) => true)(
-    render: StateVal[A] => VdomElement
+    render: StateSnapshot[A] => VdomElement
   ) = {
     Component(Props(initialValue, shouldRefresh, render))
   }
