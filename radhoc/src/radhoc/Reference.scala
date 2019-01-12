@@ -1,75 +1,61 @@
-// package radhoc
+package radhoc
 
-// import japgolly.scalajs.react.vdom.html_<^._
-// import japgolly.scalajs.react._
+import scala.scalajs.js
 
-// // allows you to easily use refs inline in DOM creation, if, for example,
-// // you need to set the location of some element (e.g., a dropdown menu)
-// // on the basis of the location of another.
-// class ReferenceComponent[A <: vdom.TopNode] {
+import japgolly.scalajs.react.vdom.html_<^._
+import japgolly.scalajs.react._
 
-//   case class Props(
-//     referencedTag: VdomTagOf[A],
-//     render: (VdomTagOf[A], Option[A]) => VdomElement
-//   )
+// allows you to easily use refs inline in DOM creation, if, for example,
+// you need to set the location of some element (e.g., a dropdown menu)
+// on the basis of the location of another.
+class Reference[A <: vdom.TopNode] {
 
-//   type State = Option[A]
+  case class Props(
+    referencedTag: VdomTagOf[A],
+    render: (VdomTagOf[A], Option[A]) => VdomTag
+  )
 
-//   class Backend(scope: BackendScope[Props, State]) {
+  type State = Option[A]
 
-//     var isRefOld: Boolean = true
-//     var referenceOpt: Option[A] = None
+  class Backend(scope: BackendScope[Props, State]) {
 
-//     def expireRef: Callback = Callback(isRefOld = true)
+    val ref = Ref[A]
 
-//     def setReference: Callback =
-//       Callback(isRefOld = false) >>
-//       scope.setState(referenceOpt)
+    def setRef: Callback = scope.setState(scala.util.Try(ref.unsafeGet).toOption)
+    val setRefFn = () => setRef.runNow
 
-//     val setReferenceFn = () => setReference.runNow
+    def render(props: Props, state: Option[A]) =
+      props.render(props.referencedTag.withRef(ref), state)
+  }
 
-//     def render(props: Props, state: Option[A]) =
-//       props.render(props.referencedTag.ref(node => referenceOpt = Some(node)), state)
-//   }
+  val Component = ScalaComponent
+    .builder[Props]("Reference")
+    .initialState(None: State)
+    .renderBackend[Backend]
+    .componentDidMount { $ =>
+      $.backend.setRef >>
+        Callback(
+          js.Dynamic.global.window.addEventListener(
+            "resize",
+            $.backend.setRefFn
+          )
+        )
+    }
+    .componentWillUnmount { $ =>
+      Callback(
+        js.Dynamic.global.window.removeEventListener(
+          "resize",
+          $.backend.setRefFn
+        )
+      )
+    }
+    .componentDidUpdate(_.backend.setRef) // TODO make sure this doesn't infinite loop or anything
+    .build
 
-//   import scala.scalajs.js
+  def make(referencedTag: VdomTagOf[A])(
+    render: (VdomTagOf[A], Option[A]) => VdomTag
+  ) = {
+    Component(Props(referencedTag, render))
+  }
 
-//   val Component = ScalaComponent
-//     .builder[Props]("Reference")
-//     .initialState(None: State)
-//     .renderBackend[Backend]
-//     .componentDidMount(
-//       context =>
-//         context.backend.setReference >>
-//         Callback(
-//           js.Dynamic.global.window.addEventListener(
-//             "resize",
-//             context.backend.setReferenceFn
-//           )
-//       )
-//     )
-//     .componentWillUnmount(
-//       context =>
-//         Callback(
-//           js.Dynamic.global.window.removeEventListener(
-//             "resize",
-//             context.backend.setReferenceFn
-//           )
-//       )
-//     )
-//     .componentWillReceiveProps(_.backend.expireRef)
-//     .componentDidUpdate(
-//       context =>
-//         if (context.backend.isRefOld) {
-//           context.backend.setReference
-//         } else Callback.empty
-//     )
-//     .build
-
-//   def make(referencedTag: VdomTagOf[A])(
-//     render: (VdomTagOf[A], Option[A]) => VdomElement
-//   ) = {
-//     Component(Props(referencedTag, render))
-//   }
-
-// }
+}

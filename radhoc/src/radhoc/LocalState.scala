@@ -14,7 +14,7 @@ class LocalState[A] {
   )
 
   val Component = ScalaComponent
-    .builder[Props]("LocalState")
+    .builder[Props]("Local State")
     .initialStateFromProps(_.initialValue)
     .render { $ => $.props.render(StateSnapshot.of($)) }
     .componentWillReceiveProps { $ =>
