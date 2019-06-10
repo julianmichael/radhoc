@@ -5,15 +5,16 @@ import ammonite.ops._
 
 val thisPublishVersion = "0.2.0-SNAPSHOT"
 
-val scalaVersions = List("2.11.12", "2.12.6")
-val thisScalaJSVersion = "0.6.23"
+val scalaVersions = List("2.12.8")
+val thisScalaJSVersion = "0.6.27"
 
 val macroParadiseVersion = "2.1.0"
 val kindProjectorVersion = "0.9.4"
 
 // cats libs -- make sure versions match up
-val catsVersion = "1.5.0"
-val scalajsReactVersion = "1.3.1"
+val jjmVersion = "0.1.0-SNAPSHOT"
+// val catsVersion = "1.6.1"
+val scalajsReactVersion = "1.4.2"
 
 class RadhocModule(val crossScalaVersion: String) extends CrossScalaModule with ScalaJSModule with ScalafmtModule with PublishModule {
 
@@ -28,7 +29,8 @@ class RadhocModule(val crossScalaVersion: String) extends CrossScalaModule with 
   )
 
   def ivyDeps = Agg(
-    ivy"org.typelevel::cats-core::$catsVersion",
+    ivy"org.julianmichael::jjm-core::$jjmVersion",
+    // ivy"org.typelevel::cats-core::$catsVersion",
     ivy"com.github.japgolly.scalajs-react::core::$scalajsReactVersion",
     ivy"com.github.japgolly.scalajs-react::extra::$scalajsReactVersion",
   )

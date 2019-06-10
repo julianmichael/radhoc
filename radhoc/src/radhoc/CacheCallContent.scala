@@ -1,5 +1,7 @@
 package radhoc
 
+import jjm.OrWrapped
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
@@ -20,7 +22,7 @@ class CacheCallContent[Request, Response](
 
   case class Props(
     request: Request, // will possibly change
-    sendRequest: Request => CacheCall[Response], // expected NOT to change
+    sendRequest: Request => OrWrapped[AsyncCallback, Response], // expected NOT to change
     willLoad: (Response => Callback) = (_ => Callback.empty), // expected NOT to change
     didLoad: (Response => Callback) = (_ => Callback.empty), // expected NOT to change
     render: (State => VdomElement) // expected NOT to change
@@ -30,14 +32,13 @@ class CacheCallContent[Request, Response](
 
     def load(props: Props): Callback =
       props.sendRequest(props.request) match {
-        case Cached(response) => scope.setState(Loaded(response))
-        case Remote(future) =>
-          scope.setState(Loading) >> Callback.future {
-            future.map { response =>
-              props.willLoad(response) >> scope.setState(Loaded(response)) >> props
-                .didLoad(response)
-            }
-          }
+        case OrWrapped.Pure(response) => scope.setState(Loaded(response))
+        case OrWrapped.Wrapped(asyncCallback) =>
+          scope.setState(Loading) >> asyncCallback.flatMap { response =>
+            (props.willLoad(response) >>
+                scope.setState(Loaded(response)) >>
+                props.didLoad(response)).asAsyncCallback
+          }.toCallback
       }
 
     def render(props: Props, s: State) =
@@ -61,7 +62,7 @@ class CacheCallContent[Request, Response](
 
   def make(
     request: Request,
-    sendRequest: Request => CacheCall[Response],
+    sendRequest: Request => OrWrapped[AsyncCallback, Response],
     willLoad: (Response => Callback) = (_ => Callback.empty),
     didLoad: (Response => Callback) = (_ => Callback.empty)
   )(

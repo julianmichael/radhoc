@@ -1,5 +1,7 @@
 package radhoc
 
+import jjm.ling.ISpan
+
 import japgolly.scalajs.react.vdom.html_<^._
 import japgolly.scalajs.react._
 
@@ -13,16 +15,16 @@ class SpanSelection[Index] {
   object SpanSelectionStatus
 
   case class SpanSelectionState(
-    spans: Map[Index, List[Span]],
+    spans: Map[Index, List[ISpan]],
     status: SpanSelectionStatus
   )
 
   object SpanSelectionState {
-    def initial = SpanSelectionState(Map.empty[Index, List[Span]].withDefaultValue(Nil), NoSpan)
+    def initial = SpanSelectionState(Map.empty[Index, List[ISpan]].withDefaultValue(Nil), NoSpan)
   }
 
   case class SpanSelectionContext(
-    setSpan: Map[Index, List[Span]] => Callback,
+    setSpan: Map[Index, List[ISpan]] => Callback,
     hover: Index => Int => Callback,
     touch: Index => Int => Callback,
     cancel: Callback
@@ -37,7 +39,7 @@ class SpanSelection[Index] {
 
   class SpanSelectionBackend(scope: BackendScope[SpanSelectionProps, SpanSelectionState]) {
 
-    def setSpan(spans: Map[Index, List[Span]]): Callback =
+    def setSpan(spans: Map[Index, List[ISpan]]): Callback =
       scope.modState(_.copy(spans = spans))
 
     // not sure why I can't just sequence the update after a modState call. but it seemed to get stuck on the stale state
@@ -94,7 +96,7 @@ class SpanSelection[Index] {
           if (relevantSpans.exists(_.contains(wordIndex)))
             SpanSelectionState(spans, Selecting(index, x, y)) // do nothing
           else
-            SpanSelectionState(spans.updated(index, Span(x, y) :: spans(index)), NoSpan) // finish span
+            SpanSelectionState(spans.updated(index, ISpan(x, y) :: spans(index)), NoSpan) // finish span
         case x => x
       }
 
