@@ -13,7 +13,6 @@ val kindProjectorVersion = "0.9.4"
 
 // cats libs -- make sure versions match up
 val jjmVersion = "0.1.0-SNAPSHOT"
-// val catsVersion = "1.6.1"
 val scalajsReactVersion = "1.4.2"
 
 class RadhocModule(val crossScalaVersion: String) extends CrossScalaModule with ScalaJSModule with ScalafmtModule with PublishModule {
@@ -28,11 +27,19 @@ class RadhocModule(val crossScalaVersion: String) extends CrossScalaModule with 
     "-Ypartial-unification",
   )
 
+  def scalacPluginIvyDeps = super.scalacPluginIvyDeps() ++ Agg(
+    ivy"org.scalamacros:::paradise:$macroParadiseVersion",
+    ivy"org.spire-math::kind-projector:$kindProjectorVersion"
+  )
+
   def ivyDeps = Agg(
     ivy"org.julianmichael::jjm-core::$jjmVersion",
-    // ivy"org.typelevel::cats-core::$catsVersion",
     ivy"com.github.japgolly.scalajs-react::core::$scalajsReactVersion",
     ivy"com.github.japgolly.scalajs-react::extra::$scalajsReactVersion",
+    ivy"com.github.japgolly.scalajs-react::ext-monocle-cats::$scalajsReactVersion",
+    ivy"com.github.japgolly.scalajs-react::ext-cats::$scalajsReactVersion",
+    // ivy"com.github.japgolly.scalacss::core::$scalajsScalaCSSVersion",
+    // ivy"com.github.japgolly.scalacss::ext-react::$scalajsScalaCSSVersion"
   )
 
   def artifactName = "radhoc"
