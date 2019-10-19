@@ -3,7 +3,7 @@ import mill.scalalib.scalafmt._
 import coursier.maven.MavenRepository
 import ammonite.ops._
 
-val thisPublishVersion = "0.3.0-SNAPSHOT"
+val thisPublishVersion = "0.3.0"
 
 val scalaVersions = List("2.12.8")
 val thisScalaJSVersion = "0.6.27"
@@ -12,7 +12,7 @@ val macroParadiseVersion = "2.1.0"
 val kindProjectorVersion = "0.9.4"
 
 // cats libs -- make sure versions match up
-val jjmVersion = "0.1.0-SNAPSHOT"
+val jjmVersion = "0.1.0"
 val scalajsReactVersion = "1.4.2"
 
 class RadhocModule(val crossScalaVersion: String) extends CrossScalaModule with ScalaJSModule with ScalafmtModule with PublishModule {
