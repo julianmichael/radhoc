@@ -2,3 +2,5 @@
 *.log
 
 out
+.bloop
+.metals

@@ -3,17 +3,20 @@ import mill.scalalib.scalafmt._
 import coursier.maven.MavenRepository
 import ammonite.ops._
 
-val thisPublishVersion = "0.3.1-SNAPSHOT"
+val thisPublishVersion = "0.4.0-SNAPSHOT"
 
-val scalaVersions = List("2.12.8")
-val thisScalaJSVersion = "0.6.27"
+val scalaVersions = List(
+  "2.12.12",
+  // "2.13.4"
+  )
+val thisScalaJSVersion = "1.4.0"
 
-val macroParadiseVersion = "2.1.0"
-val kindProjectorVersion = "0.9.4"
+val macroParadiseVersion = "2.1.1"
+val kindProjectorVersion = "0.11.3"
 
 // cats libs -- make sure versions match up
-val jjmVersion = "0.1.0"
-val scalajsReactVersion = "1.4.2"
+val jjmVersion = "0.2.0-SNAPSHOT"
+val scalajsReactVersion = "1.7.7"
 
 class RadhocModule(val crossScalaVersion: String) extends CrossScalaModule with ScalaJSModule with ScalafmtModule with PublishModule {
 
@@ -29,7 +32,7 @@ class RadhocModule(val crossScalaVersion: String) extends CrossScalaModule with 
 
   def scalacPluginIvyDeps = super.scalacPluginIvyDeps() ++ Agg(
     ivy"org.scalamacros:::paradise:$macroParadiseVersion",
-    ivy"org.spire-math::kind-projector:$kindProjectorVersion"
+    ivy"org.typelevel:::kind-projector:$kindProjectorVersion"
   )
 
   def ivyDeps = Agg(

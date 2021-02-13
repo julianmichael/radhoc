@@ -50,12 +50,13 @@ class CacheCallContent[Request, Response](
     .initialState(Loading: State)
     .renderBackend[Backend]
     .componentDidMount(context => context.backend.load(context.props))
-    .componentWillReceiveProps(
+    .componentDidUpdate(
       context =>
-        if (context.currentProps.request == context.nextProps.request) {
+      // NOTE: this conditional might not be necessary? think it is though
+        if (context.prevProps.request == context.currentProps.request) {
           Callback.empty
         } else {
-          context.backend.load(context.nextProps)
+          context.backend.load(context.currentProps)
       }
     )
     .build

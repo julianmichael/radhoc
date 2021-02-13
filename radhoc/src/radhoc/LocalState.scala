@@ -17,10 +17,10 @@ class LocalState[A] {
     .builder[Props]("Local State")
     .initialStateFromProps(_.initialValue)
     .render { $ => $.props.render(StateSnapshot.of($)) }
-    .componentWillReceiveProps { $ =>
-      if ($.currentProps.initialValue != $.nextProps.initialValue &&
-            $.nextProps.shouldRefresh($.state)) {
-        $.setState($.nextProps.initialValue)
+    .componentDidUpdate { $ =>
+      if ($.prevProps.initialValue != $.currentProps.initialValue &&
+            $.currentProps.shouldRefresh($.currentState)) {
+        $.setState($.currentProps.initialValue)
       } else Callback.empty
     }
     .build
