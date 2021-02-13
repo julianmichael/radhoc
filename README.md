@@ -1,5 +1,10 @@
 # radhoc
 
+DEPRECATED: I folded this into the jjm-ui module at [jjm](https://github.com/julianmichael/jjm)
+since I was using jjm as a dependency anyway.
+
+---
+
 Rad Higher-Order Components (or, Rendering Ad-Hoc style in React!)
 
 This is a tiny scala.js library for higher-order components that I use throughout projects
